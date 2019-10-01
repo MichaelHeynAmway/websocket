@@ -9,4 +9,10 @@ websocket:
   asynctimeoutms: 1800000
   sessiontimeoutms: 1800000
   pingtimems: 60000
+logging:
+  level:
+    root: "off"
+spring:
+  main:
+    banner-mode: "off"
 ```

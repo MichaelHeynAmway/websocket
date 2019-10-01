@@ -1,7 +1,7 @@
 package com.amway.integration.mashery;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+//import java.net.URISyntaxException;
 import java.io.IOException;
 
 import org.springframework.boot.ApplicationArguments;
