@@ -35,6 +35,7 @@ public class WebsocketLogsListenerApp implements ApplicationRunner
 	@Override
 	public void run(ApplicationArguments args) throws Exception 
 	{
+
 		// abort if config not set
 		if(url == null || url.length() < 3)
 		{
