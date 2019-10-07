@@ -1,11 +1,10 @@
 package com.amway.integration.mashery;
 
 import java.net.URI;
-//import java.net.URISyntaxException;
-import java.io.IOException;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.ApplicationRunner;
 
@@ -35,6 +34,7 @@ public class WebsocketLogsListenerApp implements ApplicationRunner
 	@Override
 	public void run(ApplicationArguments args) throws Exception 
 	{
+		boolean websocketActive = false;
 
 		// abort if config not set
 		if(url == null || url.length() < 3)
@@ -43,23 +43,48 @@ public class WebsocketLogsListenerApp implements ApplicationRunner
 			System.exit(1);
 		}
 		// open websocket
-		final WebsocketClientEndpoint clientEndPointclientEndPoint = new WebsocketClientEndpoint(new URI(url), asynctimeoutms, sessiontimeoutms);
+		try {
+		LOGGER.debug("Instantiating new websocket client: " + url);
+		WebsocketClientEndpoint clientEndPointclientEndPoint = new WebsocketClientEndpoint(new URI(url), asynctimeoutms, sessiontimeoutms);
+		LOGGER.debug("Instantiated new websocket client.");
+		websocketActive = true;
+		
 		
 		// always keep running
-		while(true)
+		while(websocketActive)
 		{
 			try { Thread.sleep(pingtimems); } catch(InterruptedException ie) { }
 			try 
 			{
-				clientEndPointclientEndPoint.sendPing(); 
-			} catch(IOException ioe) {
-				LOGGER.error("Unable to ping", ioe);
+				LOGGER.debug("Last message received check (pingtimems)");
+				if (!clientEndPointclientEndPoint.getMessageReceivedSinceLastCheck()) {
+					LOGGER.info("Websocket no message received since last check. Requesting websocket client restart.");
+					websocketActive = false;
+					break;
+				}
+			} catch(Exception e) {
+				LOGGER.error("Exception checking the endpoint connection: " + e.toString());
+				websocketActive = false;
+				break;
 			}
+		}
+		} catch(Exception e) {
+			LOGGER.error("Exception while instantiating new websocket client.");
 		}
 	}
 	
 	public static void main(String[] args) 
 	{
-		SpringApplication.run(WebsocketLogsListenerApp.class, args);
+		while(true) {
+			try {
+				LOGGER.info("Opening websocket listener.");
+				ConfigurableApplicationContext ctx = SpringApplication.run(WebsocketLogsListenerApp.class, args);
+				LOGGER.info("Closing websocket listener.");
+				ctx.close();
+				
+			}catch (Exception e){
+				LOGGER.error("Websocket listener exception: " + e.toString());
+			}
+		}
 	}
 }

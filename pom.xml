@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.amway.integration</groupId>
 	<artifactId>web-socket-listener</artifactId>
-	<version>1.0.7-RELEASE</version>
+	<version>1.0.9-RELEASE</version>
 	<name>WebSocketListener</name>
 	<description>Listen on a websocket</description>
 	<packaging>jar</packaging>
@@ -12,6 +12,7 @@
 		<java.version>1.8</java.version>
 		<spring-boot-version>1.5.9.RELEASE</spring-boot-version>
 		<logstash-logback-version>6.2</logstash-logback-version>
+		<jetty-websocket-version>9.4.21.v20190926</jetty-websocket-version>
 	</properties>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -19,10 +20,16 @@
 		<version>1.5.9.RELEASE</version>
 	</parent>
 	<dependencies>
-   <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      </dependency>
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-client -->
+		<dependency>
+		    <groupId>org.eclipse.jetty.websocket</groupId>
+		    <artifactId>websocket-client</artifactId>
+		    <version>${jetty-websocket-version}</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-api -->
 		<dependency>
 			<groupId>javax.websocket</groupId>

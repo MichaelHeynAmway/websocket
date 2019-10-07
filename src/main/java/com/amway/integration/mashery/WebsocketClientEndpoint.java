@@ -4,7 +4,6 @@ import java.net.URI;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 
 import javax.websocket.ClientEndpoint;
@@ -16,6 +15,19 @@ import javax.websocket.PongMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+
+
+//import org.eclipse.jetty.websocket.api.Session;
+//import org.eclipse.jetty.websocket.api.StatusCode;
+//import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+//import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+//import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
+//import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+//import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+//import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
+//import org.eclipse.jetty.websocket.client.WebSocketClient;
+
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +45,7 @@ public class WebsocketClientEndpoint
 	URI endpointURI;
 	Long asynctimeoutms;
 	Long sessiontimeoutms;
+	boolean messageReceived = false;
 	
 	public WebsocketClientEndpoint(URI endpointURI, Long asynctimeoutms, Long sessiontimeoutms)
 	{
@@ -70,27 +83,28 @@ public class WebsocketClientEndpoint
 	{
 		this.userSession = null; 
 		//LOGGER.error("Connection closed: " + reason);
-		System.exit(1);
+		
 	}
 	
 	
     public void onPong(PongMessage pongMessage) 
 	{
 		lastPongReceived = System.currentTimeMillis();
-		long latency = lastPongReceived - lastPingSent;
+		//long latency = lastPongReceived - lastPingSent;
 		gotPing = true;
 		//LOGGER.info("Pong after " + latency + " ms " + new String(pongMessage.getApplicationData().array(), StandardCharsets.UTF_8));
 	}
 	
-	public synchronized void sendPing() throws IOException
+	public synchronized void sendPing() throws Exception
 	{
+		try {
 		if(!gotPing)
 		{
-			//LOGGER.error("missed ping from " + lastPingSent + " will attempt reconnect");
 			// detected disconnect
-			this.userSession = connect();
+			throw new Exception("Ping IO Exception");
+			//this.userSession = connect();
 			// skip this call
-			return;
+			//return;
 		}
 		// clear status
 		gotPing = false;
@@ -98,7 +112,9 @@ public class WebsocketClientEndpoint
 		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 		buffer.putLong(0, lastPingSent);
 		userSession.getAsyncRemote().sendPing(buffer);
-		//LOGGER.info("pinging " + lastPingSent);
+		} catch(Exception e) {
+			throw new Exception("Ping IO Exception");
+		}
 	}
 	
 	public void sendPong() throws IOException
@@ -106,15 +122,25 @@ public class WebsocketClientEndpoint
 		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 		buffer.putLong(0, System.currentTimeMillis());
 		userSession.getAsyncRemote().sendPong(buffer);
-		//LOGGER.info("ponging " + buffer);
 	}
 	
 	@OnMessage
-	public void onMessage(byte[] message) {
-        try {
-			//System.out.println(new String(message, "utf-8"));
+	public void onMessage(byte[] message) throws Exception {
+		
+       try {
 			LOGGER.info(new String(message, "utf-8"));
+			messageReceived = true;
 		} catch (UnsupportedEncodingException e) {}
-
 	}
+	
+   public boolean isClosed() {
+        return userSession == null || !userSession.isOpen();
+    }
+   
+   public boolean getMessageReceivedSinceLastCheck() {
+	   boolean lastState = messageReceived;
+	   messageReceived = false;
+	   return lastState;
+   }
+
 }
