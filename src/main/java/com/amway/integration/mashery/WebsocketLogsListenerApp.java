@@ -44,9 +44,9 @@ public class WebsocketLogsListenerApp implements ApplicationRunner
 		}
 		// open websocket
 		try {
-		LOGGER.debug("Instantiating new websocket client: " + url);
-		WebsocketClientEndpoint clientEndPointclientEndPoint = new WebsocketClientEndpoint(new URI(url), asynctimeoutms, sessiontimeoutms);
-		LOGGER.debug("Instantiated new websocket client.");
+		LOGGER.info("Instantiating new websocket client: " + url);
+		WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(url), asynctimeoutms, sessiontimeoutms);
+		LOGGER.info("Instantiated new websocket client.");
 		websocketActive = true;
 		
 		
@@ -56,11 +56,14 @@ public class WebsocketLogsListenerApp implements ApplicationRunner
 			try { Thread.sleep(pingtimems); } catch(InterruptedException ie) { }
 			try 
 			{
-				LOGGER.debug("Last message received check (pingtimems)");
-				if (!clientEndPointclientEndPoint.getMessageReceivedSinceLastCheck()) {
-					LOGGER.info("Websocket no message received since last check. Requesting websocket client restart.");
+				if (!clientEndPoint.getMessageReceivedSinceLastCheck()) {
+					LOGGER.warn("Websocket not receiving messages since last check.");
 					websocketActive = false;
+					clientEndPoint.Close();
+					LOGGER.warn("Requesting websocket client restart.");
 					break;
+				} else {
+					LOGGER.debug("Websocket active and receiving messages.");
 				}
 			} catch(Exception e) {
 				LOGGER.error("Exception checking the endpoint connection: " + e.toString());

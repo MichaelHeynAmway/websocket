@@ -13,6 +13,8 @@
 		<spring-boot-version>1.5.9.RELEASE</spring-boot-version>
 		<logstash-logback-version>6.2</logstash-logback-version>
 		<jetty-websocket-version>9.4.21.v20190926</jetty-websocket-version>
+		<elasticsearch-rest-client-version>6.8.3</elasticsearch-rest-client-version>
+		<org-apache-httpcomponents-version>4.5.10</org-apache-httpcomponents-version>
 	</properties>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -23,12 +25,6 @@
 	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-client -->
-		<dependency>
-		    <groupId>org.eclipse.jetty.websocket</groupId>
-		    <artifactId>websocket-client</artifactId>
-		    <version>${jetty-websocket-version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-api -->
 		<dependency>
@@ -72,6 +68,17 @@
 		    <artifactId>logstash-logback-encoder</artifactId> 
 		    <version>${logstash-logback-version}</version> 
 		</dependency>
+		<!-- >dependency>
+		    <groupId>org.elasticsearch.client</groupId>
+		    <artifactId>elasticsearch-rest-client</artifactId>
+		    <version>${elasticsearch-rest-client-version}</version>
+		</dependency-->
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<!-->dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>${org-apache-httpcomponents-version}</version>
+		</dependency-->
 	</dependencies>
 	<build>
 		<resources>
