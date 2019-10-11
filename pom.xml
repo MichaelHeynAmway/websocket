@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.amway.integration</groupId>
 	<artifactId>web-socket-listener</artifactId>
-	<version>1.0.9-RELEASE</version>
+	<version>1.0.10-RELEASE</version>
 	<name>WebSocketListener</name>
 	<description>Listen on a websocket</description>
 	<packaging>jar</packaging>

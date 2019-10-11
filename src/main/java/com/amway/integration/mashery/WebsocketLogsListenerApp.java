@@ -44,26 +44,30 @@ public class WebsocketLogsListenerApp implements ApplicationRunner
 		}
 		// open websocket
 		try {
-		LOGGER.info("Instantiating new websocket client: " + url);
+		LOGGER.debug("Instantiating new websocket client: " + url);
 		WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI(url), asynctimeoutms, sessiontimeoutms);
-		LOGGER.info("Instantiated new websocket client.");
+		LOGGER.debug("Instantiated new websocket client and ready to receive messages.");
 		websocketActive = true;
 		
 		
 		// always keep running
 		while(websocketActive)
 		{
-			try { Thread.sleep(pingtimems); } catch(InterruptedException ie) { }
+			try {
+				LOGGER.debug("Websocket application listener sleeping.");
+				Thread.sleep(pingtimems); 
+				} catch(InterruptedException ie) { }
 			try 
 			{
-				if (!clientEndPoint.getMessageReceivedSinceLastCheck()) {
-					LOGGER.warn("Websocket not receiving messages since last check.");
+				if (!clientEndPoint.getHealthCheck()) {
+					LOGGER.warn("Websocket failed health check.");
 					websocketActive = false;
+					LOGGER.debug("Requesting close websocket connection.");
 					clientEndPoint.Close();
 					LOGGER.warn("Requesting websocket client restart.");
 					break;
 				} else {
-					LOGGER.debug("Websocket active and receiving messages.");
+					LOGGER.debug("Websocket passed health check.");
 				}
 			} catch(Exception e) {
 				LOGGER.error("Exception checking the endpoint connection: " + e.toString());
@@ -80,13 +84,13 @@ public class WebsocketLogsListenerApp implements ApplicationRunner
 	{
 		while(true) {
 			try {
-				LOGGER.info("Opening websocket listener.");
+				LOGGER.info("Opening websocket client.");
 				ConfigurableApplicationContext ctx = SpringApplication.run(WebsocketLogsListenerApp.class, args);
-				LOGGER.info("Closing websocket listener.");
+				LOGGER.warn("Closing websocket client.");
 				ctx.close();
 				
 			}catch (Exception e){
-				LOGGER.error("Websocket listener exception: " + e.toString());
+				LOGGER.error("Websocket client exception: " + e.toString());
 			}
 		}
 	}
